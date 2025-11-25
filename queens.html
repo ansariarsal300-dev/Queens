@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>International Queen Day Celebration</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #ff69b4, #ffd700, #ff1493);
+            color: white;
+            overflow: hidden;
+        }
+        .slide {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .slide.active {
+            display: flex;
+        }
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1); /* Overlay for better text contrast */
+            z-index: -1;
+        }
+        .slide h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .slide p {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+        }
+        .interactive {
+            margin: 20px 0;
+        }
+        button {
+            background: #ff1493;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background 0.3s;
+        }
+        button:hover, button:focus {
+            background: #ffd700;
+            outline: 2px solid #fff; /* Focus indicator for accessibility */
+        }
+        .confetti {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .confetti div {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ffd700;
+            animation: fall 3s linear infinite;
+        }
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+        .queen-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+        .poem {
+            font-style: italic;
+            line-height: 1.6;
+            font-size: 1.2em;
+        }
+        .surprise-message {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 4em;
+            font-family: 'Brush Script MT', cursive;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            animation: popIn 0.5s ease-out forwards;
+        }
+        @keyframes popIn {
+            to {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        .bounce {
+            animation: bounce 1s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-30px); }
+            60% { transform: translateY(-15px); }
+        }
+        .popper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        .popper div {
+            position: absolute;
+            font-size: 2em;
+            animation: popOut 2s ease-out forwards;
+        }
+        @keyframes popOut {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1) rotate(360deg) translate(var(--x), var(--y));
+                opacity: 0;
+            }
+        }
+        .fade {
+            opacity: 0.3;
+            transition: opacity 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div id="slide1" class="slide active">
+        <div class="queen-icon">👑</div>
+        <h1>Happy International Queen Day!</h1>
+        <p>Celebrating queens everywhere with style and flair.</p>
+        <button onclick="nextSlide()" aria-label="Next slide">Next</button>
+    </div>
+
+    <div id="slide2" class="slide">
+        <h1>Confetti Explosion of Love!</h1>
+        <p>Click the button to shower confetti!</p>
+        <div class="interactive">
+            <button onclick="showConfetti()" aria-label="Shower confetti">Shower Confetti</button>
+        </div>
+        <div class="confetti" id="confetti"></div>
+        <button onclick="nextSlide()" aria-label="Next slide">Next</button>
+    </div>
+
+    <div id="slide3" class="slide">
+        <h1>A Royal Poem</h1>
+        <div class="poem">
+            <p>In crowns of gold and hearts of fire,</p>
+            <p>Queens rise with grace, inspiring desire.</p>
+            <p>On this day, we honor thee,</p>
+            <p>With love, laughter, and jubilee!</p>
+        </div>
+        <button onclick="nextSlide()" aria-label="Next slide">Next</button>
+    </div>
+
+    <div id="slide4" class="slide">
+        <div class="queen-icon fade-target" id="finalIcon">👑💖</div>
+        <h1 class="fade-target">Final Wishes</h1>
+        <p class="fade-target">May your day be as fabulous as you are! Keep shining, queens.</p>
+        <div class="surprise-message" id="surpriseMessage">Surprise! You're amazing! 🎉</div>
+        <div class="popper" id="popper"></div>
+        <button onclick="surprise()" aria-label="Trigger surprise animation">Here's a surprise</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 4;
+        const slides = document.querySelectorAll('.slide');
+
+        function showSlide(slideNum) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            document.getElementById(`slide${slideNum}`).classList.add('active');
+            currentSlide = slideNum;
+        }
+
+        function nextSlide() {
+            currentSlide = currentSlide < totalSlides ? currentSlide + 1 : 1; // Loop to 1
+            showSlide(currentSlide);
+        }
+
+        function prevSlide() {
+            currentSlide = currentSlide > 1 ? currentSlide - 1 : totalSlides; // Loop to 4
+            showSlide(currentSlide);
+        }
+
+        function restart() {
+            showSlide(1);
+        }
+
+        function surprise() {
+            // Fade the previous text
+            document.querySelectorAll('.fade-target').forEach(el => el.classList.add('fade'));
+            // Trigger confetti
+            showConfetti();
+            // Animate the queen icon with bounce
+            const icon = document.getElementById('finalIcon');
+            icon.classList.add('bounce');
+            // Show surprise message with pop-in
+            const message = document.getElementById('surpriseMessage');
+            message.style.display = 'block';
+            // Party popper effect: create popping elements
+            const popper = document.getElementById('popper');
+            popper.innerHTML = '';
+            const emojis = ['🎉', '👑', '💖', '🌟', '✨'];
+            for (let i = 0; i < 10; i++) {
+                const pop = document.createElement('div');
+                pop.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                const angle = (i / 10) * 360;
+                const distance = 200 + Math.random() * 100;
+                pop.style.setProperty('--x', `${Math.cos(angle * Math.PI / 180) * distance}px`);
+                pop.style.setProperty('--y', `${Math.sin(angle * Math.PI / 180) * distance}px`);
+                pop.style.animationDelay = `${Math.random() * 0.5}s`;
+                popper.appendChild(pop);
+            }
+            // Hide after 3 seconds and remove fade/bounce
+            setTimeout(() => {
+                message.style.display = 'none';
+                icon.classList.remove('bounce');
+                document.querySelectorAll('.fade-target').forEach(el => el.classList.remove('fade'));
+                popper.innerHTML = '';
+            }, 3000);
+        }
+
+        function showConfetti() {
+            const confettiContainer = document.getElementById('confetti');
+            confettiContainer.innerHTML = '';
+            for (let i = 0; i < 30; i++) { // Reduced to 30 for performance
+                const confetti = document.createElement('div');
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.animationDelay = Math.random() * 3 + 's';
+                confettiContainer.appendChild(confetti);
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+    </script>
+</body>
+</html>
